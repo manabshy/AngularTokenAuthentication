@@ -35,7 +35,7 @@ app.post('/login', async (req,res) => {
     if(!user)
         return res.status(401).send({message: 'Email or Password invalid'})
 
-    if(userData.pwd != user.pwd)
+    if(userData.password != user.password)
         return res.status(401).send({message: 'Email or Password invalid'})
 
     var payload = {}
