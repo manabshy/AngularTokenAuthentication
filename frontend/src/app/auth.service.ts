@@ -1,23 +1,24 @@
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-
-  constructor(private http: Http) {
+  messages = []
+  path = 'http://localhost:5000/auth' 
+  constructor(private http: HttpClient) {
     console.log('auth service called');
    }
    registerUser(registerData) {
     console.log('In registerData:', registerData);
-      this.http.post('http://localhost:5000/register', registerData).subscribe(res => {
+      this.http.post(this.path + '/register', registerData).subscribe(res => {
       })
     }
     loginUser(loginData) {
-      this.http.post('http://localhost:5000/login', loginData).subscribe (res => {
+      this.http.post<any>(this.path + '/login', loginData).subscribe (res => {
         console.log('res:',res);
-        localStorage.setItem('token', res.json().token);
+        localStorage.setItem('token', res.token);
       })
     }
 

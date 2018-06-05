@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser'
 import { NgModule } from '@angular/core'
 import { RouterModule, Router } from '@angular/router'
-import { HttpModule } from '@angular/http'
+import { HttpClientModule } from '@angular/common/http'
 import {MatButtonModule, 
   MatCheckboxModule, 
   MatToolbarModule, 
@@ -17,15 +17,17 @@ import { MessagesComponent } from './messages.component'
 import { RegisterComponent } from './register.component'
 import { LoginComponent } from './login.component'
 import { UsersComponent } from './users.component'
+import { PostComponent } from './post.component'
+
 import { ProfileComponent } from './profile.component'
 import { AuthService } from './auth.service'
 
 const routes = [
+  {path: '', component: PostComponent},
   {path: 'register', component: RegisterComponent},
   {path: 'login', component: LoginComponent},
   {path: 'users', component: UsersComponent},
   {path: 'profile/:id', component: ProfileComponent},
-  
 ]
 @NgModule({
   declarations: [
@@ -34,11 +36,11 @@ const routes = [
     RegisterComponent, 
     LoginComponent, 
     UsersComponent,
-    ProfileComponent
+    ProfileComponent,
+    PostComponent
   ],
   imports: [
     BrowserModule, 
-    HttpModule,
     RouterModule.forRoot(routes), 
     MatButtonModule, 
     MatCardModule, 
@@ -47,7 +49,8 @@ const routes = [
     MatToolbarModule,
     MatListModule,
     BrowserAnimationsModule,
-    FormsModule
+    FormsModule,
+    HttpClientModule
   ],
   providers: [ApiService,AuthService],
   bootstrap: [AppComponent]
