@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser'
 import { NgModule } from '@angular/core'
 import { RouterModule, Router } from '@angular/router'
-import { HttpClientModule } from '@angular/common/http'
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http'
 import {MatButtonModule, 
   MatCheckboxModule, 
   MatToolbarModule, 
@@ -21,7 +21,7 @@ import { PostComponent } from './post.component'
 
 import { ProfileComponent } from './profile.component'
 import { AuthService } from './auth.service'
-
+import { AuthInterceptorService } from './authInterceptor.service'
 const routes = [
   {path: '', component: PostComponent},
   {path: 'register', component: RegisterComponent},
@@ -52,7 +52,11 @@ const routes = [
     FormsModule,
     HttpClientModule
   ],
-  providers: [ApiService,AuthService],
+  providers: [ApiService, AuthService, { 
+    provide: HTTP_INTERCEPTORS,
+    useClass: AuthInterceptorService,
+    multi: true
+  }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
