@@ -37,4 +37,26 @@ router.post('/login', async (req, res) => {
     })
 })
 
-module.exports = router
+var auth = {
+    router,
+    // create checkAuthenticated middleware
+    checkAuthenticated(req,res,next) {
+        if (!req.header('authorization'))
+        return res.status(401).send({ message: 'Unauthorized. Missing Auth Header' })
+
+        var token = req.header('authorization').split(' ')[1]
+        console.log('In checkAuthenticated: token', token)
+        var payload = jwt.decode(token, '123')
+
+        if (!payload)
+            return res.status(401).send({ message: 'Unauthorized. Auth Header Invalid' })
+
+        req.userId = payload.sub
+
+        next()
+
+    }
+
+}
+
+module.exports = auth

@@ -4,7 +4,7 @@ var app = express()
 var mongoose = require('mongoose')
 var bodyParser = require('body-parser')
 var auth = require('./auth.js')
-
+var jwt = require('jwt-simple')
 var User = require('./models/User.js')
 var Post = require('./models/Post.js')
 
@@ -15,14 +15,15 @@ app.use(cors())
 app.use(bodyParser.json())
 
 
+
 app.get('/posts/:id', async (req,res) => {
     var author = req.params.id
     var posts = await Post.find({author})
     res.send(posts)
 })
-app.post('/post', (req, res ) => {
+app.post('/post',auth.checkAuthenticated, (req, res ) => {
     var postData = req.body
-    postData.author = '5b15b62565ad1f92cfc2158d'
+    postData.author = auth.userId
     var post = new Post(postData)
     post.save((err, result) => {
         if (err) {
@@ -33,8 +34,9 @@ app.post('/post', (req, res ) => {
         res.sendStatus(200)
     })
 })
-app.get('/users', async (req,res) => {
+app.get('/users',  async (req,res) => {
     try {
+        console.log('userId:', req.userId)
         var users = await User.find({}, '-password -__v')
         res.send(users)
     } catch (error) {
@@ -54,8 +56,8 @@ app.get('/profile/:id', async (req,res) => {
 
 mongoose.connect('mongodb://test:test@ds229790.mlab.com:29790/pssocial', (err) => {
     if(!err)
-        console.log('connected to mongodb')
+        console.log('connected to mongodb!')
 })
 
-app.use('/auth', auth)
+app.use('/auth', auth.router)
 app.listen(5000)
