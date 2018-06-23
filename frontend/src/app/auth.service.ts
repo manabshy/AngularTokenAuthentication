@@ -18,7 +18,14 @@ export class AuthService {
   get token() {
     return localStorage.getItem(this.TOKEN_KEY)
    }
-
+  
+  get isAuthenticated() {
+    return !!localStorage.getItem(this.TOKEN_KEY)
+  }
+  
+  logout() {
+    localStorage.removeItem(this.TOKEN_KEY)
+  }
    registerUser(registerData) {
     console.log('In registerData:', registerData);
       this.http.post(this.path + '/register', registerData).subscribe(res => {
