@@ -21,14 +21,17 @@ app.get('/posts/:id', async (req,res) => {
     var posts = await Post.find({author})
     res.send(posts)
 })
-app.post('/post',auth.checkAuthenticated, (req, res ) => {
+app.post('/post', auth.checkAuthenticated, (req, res) => {
     var postData = req.body
-    postData.author = auth.userId
+    console.log('postData:' ,postData)
+    postData.author = req.userId
+
     var post = new Post(postData)
+
     post.save((err, result) => {
         if (err) {
             console.error('saving post error')
-            return res.status(500).send({message: 'saving post error'})
+            return res.status(500).send({ message: 'saving post error' })
         }
 
         res.sendStatus(200)

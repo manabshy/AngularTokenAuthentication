@@ -28,14 +28,19 @@ export class AuthService {
   }
    registerUser(registerData) {
     console.log('In registerData:', registerData);
-      this.http.post(this.path + '/register', registerData).subscribe(res => {
-      })
+      this.http.post<any>(this.path + '/register', registerData).subscribe(res => { 
+      this.saveToken(res.token)
+    })
     }
     loginUser(loginData) {
       this.http.post<any>(this.path + '/login', loginData).subscribe (res => {
         console.log('res:',res);
-        localStorage.setItem(this.TOKEN_KEY, res.token);
+        this.saveToken(res.token)
       })
+    }
+    saveToken(token) {
+      localStorage.setItem(this.TOKEN_KEY,token)
+
     }
 
 }   
