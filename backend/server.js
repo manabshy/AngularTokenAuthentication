@@ -2,55 +2,65 @@ var express = require('express')
 var cors = require('cors')
 var app = express()
 var mongoose = require('mongoose')
-var jwt = require('jwt-simple')
 var bodyParser = require('body-parser')
+var auth = require('./auth.js')
+var jwt = require('jwt-simple')
 var User = require('./models/User.js')
-var posts = [
-    {message: 'Message 1 from the server'},
-    {message: 'Message 2 from the server'}
-]
+var Post = require('./models/Post.js')
+
+
+mongoose.Promise = Promise
 
 app.use(cors())
 app.use(bodyParser.json())
 
 
-app.get('/posts', (req,res) => {
+
+app.get('/posts/:id', async (req,res) => {
+    var author = req.params.id
+    var posts = await Post.find({author})
     res.send(posts)
 })
-app.post('/register', (req,res) => {
-    var userData = req.body
-    var user = new User(userData)
-    user.save((err,result) => {
-        if(err){
-            console.log('saving user error')
+app.post('/post', auth.checkAuthenticated, (req, res) => {
+    var postData = req.body
+    console.log('postData:' ,postData)
+    postData.author = req.userId
+
+    var post = new Post(postData)
+
+    post.save((err, result) => {
+        if (err) {
+            console.error('saving post error')
+            return res.status(500).send({ message: 'saving post error' })
         }
+
         res.sendStatus(200)
     })
 })
-app.post('/login', async (req,res) => {
-    var userData = req.body
-
-    var user = await User.findOne({email: userData.email})
-
-    if(!user)
-        return res.status(401).send({message: 'Email or Password invalid'})
-
-    if(userData.password != user.password)
-        return res.status(401).send({message: 'Email or Password invalid'})
-
-    var payload = {}
-
-    var token = jwt.encode(payload, '123')
-
-    console.log('user:', user);
-    //Every jwt:token has three parts: header,payload and signature
-    console.log('token', token); 
-    res.status(200).send({token})
+app.get('/users',  async (req,res) => {
+    try {
+        console.log('userId:', req.userId)
+        var users = await User.find({}, '-password -__v')
+        res.send(users)
+    } catch (error) {
+        console.error(error)
+        res.sendStatus(500)        
+    }
+})
+app.get('/profile/:id', async (req,res) => {
+    try {
+        var user = await User.findById(req.params.id, '-password -__v')
+        res.send(user)
+    } catch (error) {
+        console.error(error)
+        res.sendStatus(500)        
+    }
 })
 
 mongoose.connect('mongodb://test:test@ds229790.mlab.com:29790/pssocial', (err) => {
     if(!err)
-        console.log('connected to mongodb')
+        console.log('connected to mongodb!')
 })
 
+app.use('/auth', auth.router)
 app.listen(5000)
